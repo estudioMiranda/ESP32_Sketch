@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+
+<script>
+
+var connection = new WebSocket('ws://'+location.hostname+':81/');
+
+var board ;
+var pin ;
+var pin_status ;
+
+function button_on1()
+{
+  board = 1; 
+  pin= 2;
+  pin_status= 1; 
+  console.log("Led 1 is ON");
+  send_data();
+}
+
+function button_off1()
+{
+  board = 1; 
+  pin= 2;
+  pin_status= 0; 
+  console.log("Led 1 is OFF");
+  send_data();
+}
+
+function button_on2()
+{
+  board = 2; 
+  pin= 2;
+  pin_status= 1; 
+  console.log("Led 2 is ON");
+  send_data();
+}
+
+function button_off2()
+{
+  board = 2; 
+  pin= 2;
+  pin_status= 0; 
+  console.log("Led 2 is OFF");
+  send_data();
+}
+
+function send_data()
+{
+  var datoBoton = {
+    "board" : board ,
+    "pin" : pin,
+    "pin_status" : pin_status };
+    this.connection.send(JSON.stringify(datoBoton));
+}
+
+</script>
+
+<body>
+<center>
+
+<h1>ESP32 PainlessMesh WebSocket</h1>
+
+<h3> Placa 1 </h3>
+<button onclick= "button_on1()">On</button>
+<button onclick= "button_off1()">Off</button>
+
+<h3> Placa 2 </h3>
+<button onclick= "button_on2()">On</button>
+<button onclick= "button_off2()">Off</button>
+
+
+</center>
+</body>
+
+</html>

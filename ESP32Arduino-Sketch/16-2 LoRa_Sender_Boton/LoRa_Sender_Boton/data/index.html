@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+
+<script>
+
+var connection = new WebSocket('ws://'+location.hostname+':81/');
+var estado_boton = 0;
+
+function button_on()
+{
+   estado_boton = 1; 
+  console.log("Led is ON");
+  send_data();
+}
+
+function button_off()
+{
+  estado_boton = 0;
+console.log("Led is OFF");
+send_data();
+}
+
+function send_data()
+{
+  var led_estado= '{"Led" :'+estado_boton+'}';
+  connection.send(led_estado);
+}
+
+</script>
+
+<body>
+<center>
+
+<h1>ESP32 Digital output Botón y PWM input sensor Temperatura y Humedad</h1>
+
+<h3> Led </h3>
+<button onclick= "button_on()">On</button>
+<button onclick= "button_off()">Off</button>
+
+</center>
+</body>
+
+</html>

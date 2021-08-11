@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<script>
+
+var connection = new WebSocket('ws://'+location.hostname+':81/');
+
+function button_1_on()
+{
+  console.log("Led esta en ON");
+  connection.send("Led esta en ON");
+}
+
+function button_1_off()
+{
+console.log("Led esta en OFF");
+connection.send("Led esta en OFF");
+}
+</script>
+
+<body>
+
+<center>
+<h1>ESP32 Led on/off</h1>
+
+<h3> LED </h3>
+<button onclick= "button_1_on()" >On</button>
+<button onclick="button_1_off()" >Off</button>
+</center>
+</body>
+</html>

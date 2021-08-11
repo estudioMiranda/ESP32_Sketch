@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<head>
+    <script src="https://unpkg.com/vue@next"></script>
+</head>
+
+<body>
+    <div id="vue">
+      <center>
+            <h1>ESP32 Digital output Boton y PWM input sensor Temperatura y Humedad</h1>
+                <h3> Led </h3>
+                    <button @click= "botonOn" >On</button>
+                    <button @click= "botonOff" >Off</button>
+
+                <h3>Temperatura</h3>
+                    <meter :value="temperatura" min="0" max="100"> </meter>
+                    <h3 style="display: inline-block;"> {{ temperatura }} </h3>
+
+                <h3>Humedad</h3>
+                    <meter :value="humedad" min="0" max="100"> </meter>
+                    <h3 style="display: inline-block;"> {{ humedad }} </h3>
+          </center>      
+    </div>
+    <script>
+        const app = {
+    data() {
+      return {
+        temperatura: 0,
+        humedad: 0,
+        boton_estado: 0,
+        connection : new WebSocket('ws://'+location.hostname+':81/')
+      }
+    },
+    
+    methods: {
+
+      recibir(event){
+        var datosSensor = event.data;
+        var data = JSON.parse(datosSensor);
+        this.temperatura = data.temp;
+        this.humedad = data.hum;
+      },
+      
+      botonOn(){
+        this.boton_estado = 1; 
+        console.log("Led is ON")
+        this.enviarDato()
+      },
+
+      botonOff(){
+        this.boton_estado = 0;
+        console.log("Led is OFF")
+        this.enviarDato()
+      },
+      
+      enviarDato(){
+        var led_estado = '{"Led" :'+this.boton_estado+'}'
+        this.connection.send(led_estado)
+      },
+    },
+    
+    mounted() {
+      this.connection.onmessage = event => {
+        this.recibir(event)
+      }
+  }
+}
+
+Vue.createApp(app).mount('#vue')
+    </script>  
+</body>
+</html>

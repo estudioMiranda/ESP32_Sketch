@@ -1,0 +1,67 @@
+<!DOCTYPE HTML><html>
+<head>
+  <meta charset="utf-8">
+  <title>ESP32 ESP-NOW</title>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      text-align: center;
+    }
+    header {
+      margin: 0;
+      padding-top: 5vh;
+      padding-bottom: 5vh;
+      overflow: hidden;
+      background-image: url(winter);
+      background-size: cover;
+      color: white;
+    }
+    h2 {
+      font-size: 2.0rem;
+    }
+    p { font-size: 1.2rem; }
+    .units { font-size: 1.2rem; }
+    .readings { font-size: 2.0rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>ESP32 ESP-NOW</h2>
+    <p>ID: <span id="id"></span></p>
+    <p>ID paquete: <span id="readingId"></span></p>
+  </header>
+<main>
+  <p>
+    <i class="fas fa-thermometer-half" style="color:#059e8a;"></i> 
+    Temperatura: <span id="temperatura"></span>
+  </p>
+  <p>
+    <i class="fas fa-tint" style="color:#00add6;"></i> Humedad: <span id="humedad"></span>
+    <sup>&#37;</sup>
+  </p>
+</main>
+<script>
+
+  var connection = new WebSocket('ws://'+location.hostname+':81/');
+
+  connection.onmessage = function(event){
+
+  var datos_sensores = event.data;
+  console.log (datos_sensores);
+  var data = JSON.parse(datos_sensores);
+  temperatura = data.temperature.toFixed(2); // Truncar a dos decimales
+  humedad = data.humidity;
+  id = data.id;
+  readingId = data.readingId;
+  
+  document.getElementById("temperatura").innerHTML = temperatura;
+  document.getElementById("humedad").innerHTML = humedad;
+  document.getElementById("id").innerHTML = id;
+  document.getElementById("readingId").innerHTML = readingId;
+}
+
+</script>
+</body>
+</html>

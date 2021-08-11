@@ -1,0 +1,72 @@
+<!DOCTYPE HTML><html>
+<head>
+  <meta charset="utf-8">
+  <title>ESP32 (LoRa + Server)</title>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      text-align: center;
+    }
+    header {
+      margin: 0;
+      padding-top: 5vh;
+      padding-bottom: 5vh;
+      overflow: hidden;
+      background-image: url(winter);
+      background-size: cover;
+      color: white;
+    }
+    h2 {
+      font-size: 2.0rem;
+    }
+    p { font-size: 1.2rem; }
+    .units { font-size: 1.2rem; }
+    .readings { font-size: 2.0rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>ESP32 LoRa + Servidor Web</h2>
+    <p><strong>Último paquete recibido:<br/><span id="hora"></span></strong></p>
+    <p>LoRa RSSI: <span id="rssi"></span></p>
+  </header>
+<main>
+  <p>
+    <i class="fas fa-thermometer-half" style="color:#059e8a;"></i> 
+    Temperatura: <span id="temperatura"></span>
+  </p>
+  <p>
+    <i class="fas fa-tint" style="color:#00add6;"></i> Humedad: <span id="humedad"></span>
+    <sup>&#37;</sup>
+  </p>
+  <p>
+    <i class="fas fa-angle-double-down" style="color:#e8c14d;"></i> Presión: <span id="presion"></span>
+    <sup>hpa</sup>
+  </p>
+</main>
+<script>
+
+  var connection = new WebSocket('ws://'+location.hostname+':81/');
+
+  connection.onmessage = function(event){
+
+  var datos_sensores = event.data;
+  console.log (datos_sensores);
+  var data = JSON.parse(datos_sensores);
+  temperatura = data.temp;
+  humedad = data.hum;
+  presion = data.pres;
+  hora = data.time;
+  rssi = data.rssi;
+  document.getElementById("temperatura").innerHTML = temperatura;
+  document.getElementById("humedad").innerHTML = humedad;
+  document.getElementById("presion").innerHTML = presion;
+  document.getElementById("hora").innerHTML = hora;
+  document.getElementById("rssi").innerHTML = rssi;
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<head>
+</head>
+
+<body>
+  <!-- vista -->
+  <div>
+    <center>
+          <h1>ESP32 PWM Led</h1>
+          <br>
+          <label>PWM led</label>
+          <br>
+          <input onchange= "enviarDato(this)" id="potenciometro" type="range" min="0" max="255" value="0">
+          <br>
+          <p>Intensidad: <span id="intensidad"></span></p>
+    </center>      
+  </div>
+  <!-- Funciones -->
+  <script>
+    
+    var websocket = new WebSocket('ws://'+location.hostname+':81/');
+
+    function enviarDato(element) {
+      var intensidad = document.getElementById(element.id).value;
+      document.getElementById("intensidad").innerHTML = intensidad;
+      var datoPWM= '{"Led" : '+intensidad+' }'
+      websocket.send(datoPWM)
+      }
+  </script>  
+</body>
+</html>

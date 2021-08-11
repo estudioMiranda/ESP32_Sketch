@@ -1,0 +1,44 @@
+<!-- 
+    Modificado por StudioMiranda ArduinoES
+    Complete project details: https://randomnerdtutorials.com/esp32-web-server-websocket-sliders/ 
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ESP32 ARDUINO</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <div class="topnav">
+        <h1>Multiple Potenciómetros</h1>
+    </div>
+    <div class="content">
+        <div class="card-grid">
+            <div class="card">
+                <p class="card-title">Potenciómetro 1</p>
+                <p class="switch">
+                    <input type="range" onchange="updateSliderPWM(this)" id="slider1" min="0" max="100" step="1" value ="0" class="slider">
+                </p>
+                <p class="state">Brillo <span id="sliderValue1"></span> &percnt;</p>
+            </div>
+            <div class="card">
+                <p class="card-title"> Potenciómetro 2</p>
+                <p class="switch">
+                    <input type="range" onchange="updateSliderPWM(this)" id="slider2" min="0" max="100" step="1" value ="0" class="slider">
+                </p>
+                <p class="state">Brillo: <span id="sliderValue2"></span> &percnt;</p>
+            </div>
+            <div class="card">
+                <p class="card-title"> Potenciómetro 3</p>
+                <p class="switch">
+                    <input type="range" onchange="updateSliderPWM(this)" id="slider3" min="0" max="100" step="1" value ="0" class="slider">
+                </p>
+                <p class="state">Brillo: <span id="sliderValue3"></span> &percnt;</p>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

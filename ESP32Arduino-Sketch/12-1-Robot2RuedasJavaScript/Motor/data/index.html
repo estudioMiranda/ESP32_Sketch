@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<head>
+  
+</head>
+
+<body>
+      <center>
+        <h1>ESP32 Robot 2 Ruedas</h1>
+
+        <h3> Motor </h3>
+          <div>
+            <button onclick= "Avanzar()">Avanzar</button>
+          </div>
+          <div>
+            <button onclick= "Izquierda()" >Izquierda</button>
+            <button onclick= "Derecha()" >Derecha</button>
+          </div>
+          <div>
+            <button onclick= "Retroceder()" >Retroceder</button>
+          </div>
+          <div>
+            <button onclick= "Parar()" >Parar</button>
+          </div>
+          <div>
+            <input onchange= "Velocidad(this)" id="velocidad" type="range" min="0" max="255">
+            <p>Valor: <span id="valor"></span></p>
+          </div>
+          </center>      
+    </div>
+    
+    <script>
+      var websocket = new WebSocket('ws://'+location.hostname+':81/');
+      var sentido;
+      var velocidad;
+      
+      function Avanzar(){
+        sentido = 1 ;
+        enviar_dato_motor()
+        console.log("Motor avanza")
+        }
+      function Retroceder(){
+        sentido = 2;
+        enviar_dato_motor()(sentido)
+        console.log("Motor retrocede")
+        }
+      function Izquierda(){
+        sentido = 3 ;
+        enviar_dato_motor()(sentido)
+        console.log("Motor izquieda")
+        }
+      function Derecha(){
+        sentido = 4 ;
+        enviar_dato_motor()(sentido)
+        console.log("Motor derecha")
+        }
+      function Parar(){
+        sentido = 0 ;
+        enviar_dato_motor()(sentido)
+        console.log("Motor parar")
+        }
+      function Velocidad(element){
+        velocidad = document.getElementById(element.id).value;   
+        document.getElementById("valor").innerHTML = velocidad;
+        console.log(velocidad)
+      }
+
+      function enviar_dato_motor() {
+        var datoMotor = '{"Motor" : "'+sentido+'" , "Velocidad" : "'+velocidad+'"}'
+        websocket.send(datoMotor)
+      }
+
+    </script>  
+</body>
+</html>

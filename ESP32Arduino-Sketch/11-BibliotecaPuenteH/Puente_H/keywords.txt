@@ -1,0 +1,19 @@
+###########################################
+# Syntax Coloring Map For L9110 Motor Library
+###########################################
+
+###########################################
+# Datatypes Classes KEYWORD1 and are colored orange
+###########################################
+
+Motor	KEYWORD1
+
+###########################################
+# Methods and Functions KEYWORD2 are colored brown
+###########################################
+
+Avanzar	KEYWORD2
+Retroceder	KEYWORD2
+GirarIzquierda	KEYWORD2
+GirarDerecha	KEYWORD2
+Parar	KEYWORD2

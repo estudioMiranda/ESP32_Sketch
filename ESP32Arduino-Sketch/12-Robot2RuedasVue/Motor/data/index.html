@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+
+<head>
+    <script src="https://unpkg.com/vue@next"></script>
+</head>
+
+<body>
+    <div id="nombre1">
+      <center>
+        <h1>ESP32 PWM Motor</h1>
+
+        <h3> Motor </h3>
+          <div>
+            <button @click= "Avanzar" >Avanzar</button>
+          </div>
+          <div>
+            <button @click= "Izquierda" >Izquierda</button>
+            <button @click= "Derecha" >Derecha</button>
+          </div>
+          <div>
+            <button @click= "Retroceder" >Retroceder</button>
+          </div>
+          <div>
+            <button @click= "Parar" >Parar</button>
+          </div>
+          <div>
+            <input @change= "velocidad" v-model="velocidad" type="range" min="0" max="255">
+            <p>Valor: <span>{{ velocidad }}</span></p>
+          </div>
+          </center>      
+    </div>
+    
+    <script>
+        const nombre2 = {
+    data() {
+      return {
+        botonMover: "",
+        velocidad: 255,
+        connection : new WebSocket('ws://'+location.hostname+':81/')
+      }
+    },
+    
+    methods: {
+      
+      Avanzar(){
+        this.botonMover = 1 ; 
+        console.log("Motor avanza")
+        this.enviar_dato_motor()
+      },
+      Retroceder(){
+        this.botonMover = 2 ; 
+        console.log("Motor retroceder")
+        this.enviar_dato_motor()
+      },
+      Izquierda(){
+        this.botonMover = 3 ; 
+        console.log("Motor gira izquierda")
+        this.enviar_dato_motor()
+      },
+      Derecha(){
+        this.botonMover = 4 ; 
+        console.log("Motor gira derecha")
+        this.enviar_dato_motor()
+      },
+      Parar(){
+        this.botonMover = 0 ; 
+        console.log("Motor gira derecha")
+        this.enviar_dato_motor()
+      },
+      enviar_dato_motor(){
+        var datoMover = '{"Motor" : "'+this.botonMover+'" , "Velocidad" : "'+this.velocidad+'"}'
+        this.connection.send(datoMover)
+      },
+    },
+}
+
+Vue.createApp(nombre2).mount('#nombre1')
+    </script>  
+</body>
+</html>
