@@ -1,4 +1,4 @@
-# ESP32_Sketch
+# ESP32 Ejemplos / Sketch
 
 ## Gracias por ver mis vídeos 😉
 
