@@ -59,7 +59,7 @@ void setup(void)
   Serial.begin(115200);
   
  // Pon aquí tu ssid y contraseña
-  WiFi.begin("studiomiranda", "88888888");
+  WiFi.begin("Museo", "sCientific0s");
   Serial.print("Conectando");
   while (WiFi.status() != WL_CONNECTED)
   {
