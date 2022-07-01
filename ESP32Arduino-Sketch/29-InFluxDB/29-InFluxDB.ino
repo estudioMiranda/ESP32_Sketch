@@ -1,11 +1,13 @@
 
-// Based on this library example: https://github.com/tobiasschuerg/InfluxDB-Client-for-Arduino/blob/master/examples/SecureBatchWrite/SecureBatchWrite.ino
-
+// Bibliotecas
 #include <Arduino.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
+#include <InfluxDbClient.h>
+#include <InfluxDbCloud.h>
 
+// Tipo de tarjeta
 #if defined(ESP32)
   #include <WiFiMulti.h>
   WiFiMulti wifiMulti;
@@ -17,106 +19,111 @@
   #define WIFI_AUTH_OPEN ENC_TYPE_NONE
 #endif
 
-#include <InfluxDbClient.h>
-#include <InfluxDbCloud.h>
-
+// Conexiópn WiFi router 
 #define WIFI_SSID "studiomiranda"
+// Contraseña WiFi
 #define WIFI_PASSWORD "88888888"
 
 // InfluxDB v2 server url, e.g. https://eu-central-1-1.aws.cloud2.influxdata.com (Use: InfluxDB UI -> Load Data -> Client Libraries)
 #define INFLUXDB_URL "https://europe-west1-1.gcp.cloud2.influxdata.com"
-
 // InfluxDB v2 server or cloud API token (Use: InfluxDB UI -> Data -> API Tokens -> Generate API Token)
-#define INFLUXDB_TOKEN "J9x20MVErqOjm1rp7gG10TfWjsO97O4dTuFsLKLqMf4PdlP9fU2-TwfapXUanKE7CZGJ8QcEDYUcXNeKwK5m3A=="
-
+#define INFLUXDB_TOKEN "knUhcPOh0LvEsJqne_SsvRKqvyA0Dsrxq8F3qb6Qmfq7iRpZFtc-_PHG7ncFsImbvy0vnoe_RRWTtp0bnU81DQ=="
 // InfluxDB v2 organization id (Use: InfluxDB UI -> User -> About -> Common Ids )
 #define INFLUXDB_ORG "444cuatro@gmail.com"
-
 // InfluxDB v2 bucket name (Use: InfluxDB UI ->  Data -> Buckets)
 #define INFLUXDB_BUCKET "ESP32"
 
-// Zona horaria Central Europe: "CET-1CEST,M3.5.0,M10.5.0/3"
-#define TZ_INFO "WET0WEST,M3.5.0/1,M10.5.0"
+// Configuración zona horaria https://www.gnu.org/software/libc/manual/html_node/TZ-Variable.html
+//  Madrid: "CET-1CEST,M3.5.0,M10.5.0/3"
+#define TZ_INFO "CET-1CEST,M3.5.0,M10.5.0/3"
 
+// Instancia de la clase InfluxDB client
 InfluxDBClient client(INFLUXDB_URL, INFLUXDB_ORG, INFLUXDB_BUCKET, INFLUXDB_TOKEN, InfluxDbCloud2CACert);
 
-Point sensorReadings("measurements");
+// Lectura del sensor
+Point sensorReadings("medidas");
 
-//BME280
-Adafruit_BME280 bme; // I2C
+// Instancia de la clase BME280 I2C
+Adafruit_BME280 bme;
 
-float temperature;
-float humidity;
-float pressure;
+// Variables
+float temperatura;
+float humedad;
+float presion;
 
-// Initialize BME280
+// Detectando sensor BME280
 void initBME(){
   if (!bme.begin(0x76)) {
-    Serial.println("Could not find a valid BME280 sensor, check wiring!");
+    Serial.println("¡Sensor BME280 no dectado, compruebe los conectores!");
     while (1);
   }
 }
 
 void setup() {
+  
   Serial.begin(115200);
 
-  // Setup wifi
+  // WiFi
   WiFi.mode(WIFI_STA);
   wifiMulti.addAP(WIFI_SSID, WIFI_PASSWORD);
 
-  Serial.print("Connecting to wifi");
+  Serial.print("Iniciando conexión WiFi");
   while (wifiMulti.run() != WL_CONNECTED) {
     Serial.print(".");
     delay(500);
   }
   Serial.println();
   
+  //Iniciado el sensor BME280 
   initBME();
   
-  // Add tags
-  sensorReadings.addTag("device", DEVICE);
-  sensorReadings.addTag("location", "office");
+  // Añadiendo etiquetas
+  sensorReadings.addTag("dispositivo", DEVICE);
+  sensorReadings.addTag("localización", "A Coruña");
   sensorReadings.addTag("sensor", "bme280");
 
+  // Se necesita validación horaria para la certificación
+  // Servidores NTP cercanos: https://www.pool.ntp.org/zone/
+  // El progreso se imprime en el monitor serie.
   timeSync(TZ_INFO, "pool.ntp.org", "time.nis.gov");
 
-  // Check server connection
+  // Validando servidores
   if (client.validateConnection()) {
-    Serial.print("Connected to InfluxDB: ");
+    Serial.print("Conexión establecida a InfluxDB: ");
     Serial.println(client.getServerUrl());
   } else {
-    Serial.print("InfluxDB connection failed: ");
+    Serial.print("No se ha podido realizar la conexión a InfluxDB: ");
     Serial.println(client.getLastErrorMessage());
   }
 }
 
 void loop() {
-  // Get latest sensor readings
-  temperature = bme.readTemperature();
-  humidity = bme.readHumidity();
-  pressure = bme.readPressure()/100.0F;
+  // Lectura de sensores
+  temperatura = bme.readTemperature();
+  humedad = bme.readHumidity();
+  presion = bme.readPressure()/100.0F;
 
-  // Add readings as fields to point
-  sensorReadings.addField("temperature", temperature);
-  sensorReadings.addField("humidity", humidity);
-  sensorReadings.addField("pressure", pressure);
+  // Añadiendo campos al punto mensaje
+  sensorReadings.addField("temperatura", temperatura);
+  sensorReadings.addField("humedad", humedad);
+  sensorReadings.addField("presion", presion);
 
-  // Print what are we exactly writing
-  Serial.print("Writing: ");
+  // Imprime los datos que envía
+  Serial.print("Escribiendo: ");
   Serial.println(client.pointToLineProtocol(sensorReadings));
   
-  // Write point into buffer
+  // Escribe dentro del buffer
   client.writePoint(sensorReadings);
 
-  // Clear fields for next usage. Tags remain the same.
+  // Limpia los campos para próximas lecturas.
   sensorReadings.clearFields();
 
-  // If no Wifi signal, try to reconnect it
+  // Reconecta si la señal se pierde
   if (wifiMulti.run() != WL_CONNECTED) {
-    Serial.println("Wifi connection lost");
+    Serial.println("Conexión WiFi perdida");
   }
 
-  // Wait 10s
-  Serial.println("Wait 10s");
+  // Espera de 10 segundos
+  Serial.println("Espera de 10 segundos");
   delay(10000);
 }
