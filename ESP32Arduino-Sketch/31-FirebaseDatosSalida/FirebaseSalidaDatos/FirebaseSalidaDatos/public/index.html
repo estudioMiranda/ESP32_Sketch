@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!-- Complete Project Details at: https://RandomNerdTutorials.com/ -->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ESP IoT Firebase App</title>
+
+    <!-- update the version number as needed -->
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-app.js"></script>
+
+    <!-- include only the Firebase features as you need -->
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-database.js"></script>
+
+    <script>
+      // REPLACE WITH YOUR web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyBxpN96txKPzbzuaiIimRzcHBIfKTbxE5Y",
+        authDomain: "esp32-affae.firebaseapp.com",
+        databaseURL: "https://esp32-affae-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "esp32-affae",
+        storageBucket: "esp32-affae.appspot.com",
+        messagingSenderId: "317721970335",
+        appId: "1:317721970335:web:62beb27a5d726eb42344aa"
+      };
+
+      // Initialize firebase
+      firebase.initializeApp(firebaseConfig);
+
+      // Make auth and database references
+      const auth = firebase.auth();
+      const db = firebase.database();
+
+    </script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+  <!--TOP BAR-->
+  <div class="topnav">
+    <h1>ESP Control de salidas GPIO <i class="fas fa-lightbulb"></i></h1>
+  </div>
+
+  <!--AUTHENTICATION BAR (USER DETAILS/LOGOUT BUTTON)-->
+  <div id="authentication-bar" style="display: none;">
+    <p><span id="authentication-status">Inicio sesión</span>
+       <span id="user-details">CORREO ELECTRÓNICO</span>
+       <a href="/" id="logout-link">(Cerrar sesión)</a>
+    </p>
+  </div>
+
+  <!--LOGIN FORM-->
+  <form id="login-form" style="display: none;">
+    <div class="form-elements-container">
+      <label for="input-email"><b>Correo electrónico</b></label>
+      <input type="text" placeholder="Enter Username" id="input-email" required>
+
+      <label for="input-password"><b>Contraseña</b></label>
+      <input type="password" placeholder="Enter Password" id="input-password" required>
+
+      <button type="submit" id="login-button">Inicio sesión</button>
+      <p id="error-message" style="color:red;"></p>
+    </div>
+  </form>
+
+  <!--CONTENT (SENSOR READINGS)-->
+  <div class="content-sign-in" id="content-sign-in" style="display: none;">
+    <div class="card-grid">
+      <!--CARD FOR GPIO 12-->
+      <div class="card">
+        <p class="card-title"><i class="fas fa-lightbulb"></i>Led Integrado</p>
+        <p>
+          <button class="button-on" id="btnOn">ON</button>
+          <button class="button-off" id="btnOff">OFF</button>
+        </p>
+        <p class="state">Estado:<span id="state"></span></p>
+      </div>
+  </div>
+    <script src="scripts/auth.js"></script>
+    <script src="scripts/index.js"></script>
+  </body>
+</html>
