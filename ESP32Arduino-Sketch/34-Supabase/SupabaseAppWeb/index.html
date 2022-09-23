@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Supabase</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+    <script>
+      const SUPABASE_URL = "https://vommeepgegbaadwlmcns.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvbW1lZXBnZWdiYWFkd2xtY25zIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTc1NTU0NDUsImV4cCI6MTk3MzEzMTQ0NX0.COSffX_5xvZOJrqt7ddbwGV32KggfYK-TeZRTUyeC_c";
+
+      const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    </script>
+
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+      integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr"
+      crossorigin="anonymous"
+    />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+  </head>
+
+  <body>
+    <!--Barra Título-->
+    <div class="topnav">
+      <h1>Lecturas del sensor DHT11 <i class="fas fa-clipboard-list"></i></h1>
+    </div>
+    <!--LECTURAS DEL SENSOR-->
+    <div id="holder"></div>
+    <div>
+      <div class="cards">
+        <!--TEMPERATURA-->
+        <div class="card">
+          <p>
+            <i class="fas fa-thermometer-half" style="color: #059e8a"></i>
+            TEMPERATURA
+          </p>
+          <p>
+            <span class="reading"><span id="temp"></span> &deg;C</span>
+          </p>
+        </div>
+        <!--HUMEDAD-->
+        <div class="card">
+          <p><i class="fas fa-tint" style="color: #00add6"></i> HUMEDAD</p>
+          <p>
+            <span class="reading"><span id="hum"></span> &percnt;</span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <script>
+      async function obtenerProductos() {
+        try {
+          const { data, error } = await _supabase
+            .from('ESP32')
+            .select()
+        let temperatura = ''
+        let humedad = ''
+        data.forEach(function(item){
+        temperatura = item.temperatura
+        humedad = item.humedad
+        console.log(data)
+      }) 
+      document.getElementById('temp').innerHTML =temperatura.toFixed(2)
+      document.getElementById('hum').innerHTML =humedad
+      }
+        catch (err) {
+          console.error("Error al recibir los datos de la db", err);
+        }
+    };
+
+    async function subscribeSensor() {
+        const mySubscription = _supabase
+          .from('ESP32')
+          .on('*', (payload) => {
+            obtenerProductos();
+            console.log('¡Recibiendo cambios!', payload)
+          })
+          .subscribe() 
+          obtenerProductos();
+    }
+    subscribeSensor();
+
+    </script>
+  </body>
+</html>
