@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+/* for chrome/safari */
+.slider {
+  -webkit-appearance: none;
+  width: 50%;
+  height: 15px;
+  background: rgb(83, 82, 82);
+  outline: none;
+
+  border-radius: 8px;
+}
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 40px;
+  background: rgb(200, 5, 5);
+  cursor: pointer;
+  border-radius: 4px;
+}
+.slider::-moz-range-thumb {
+  width: 20px;
+  height: 40px;
+  background: rgb(200, 5, 5);
+  cursor: pointer;
+  border-radius: 4px;
+}
+    </style>
+  </head>
+  <body>
+    <h1>Potenciómetro Deslizador</h1>
+      <input
+        type="range"
+        min="0"
+        max="255"
+        value="128"
+        class="slider"
+        id="potenciometro"
+      />
+      <p>Value: <span id="valor"></span></p>
+    <script>
+      var slider = document.getElementById("potenciometro");
+      var output = document.getElementById("valor");
+      output.innerHTML = slider.value;
+
+      slider.oninput = function () {
+        output.innerHTML = this.value;
+      };
+    </script>
+  </body>
+</html>

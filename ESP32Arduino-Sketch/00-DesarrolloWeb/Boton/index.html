@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+
+.boton {
+ padding: 10px;
+ background: rgb(0, 115, 255);
+ border-radius: 10px;
+ border: none;
+ color: white
+}
+    </style>
+  </head>
+  <body>
+    <h1>Botón</h1>
+
+   <button class="boton" onclick="onOff()">On / Off</button>
+
+      <p>Value: <span id="valor"></span></p>
+    <script>
+      var estado = false;
+
+      function onOff() {
+        estado = !estado;
+        var salida = document.getElementById("valor");
+        salida.innerHTML = estado;
+        console.log("botón pulsado", estado)
+      };
+    </script>
+  </body>
+</html>
