@@ -2,8 +2,8 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
-const char* ssid = "studio";
-const char* password =  "88888888";
+const char* ssid = "tu conexión a internet";
+const char* password =  "tu contraseña";
 
 // Supabase
 String url = "https://mgqasbkqqquvixgxsfgo.supabase.co/rest/v1/DHT";
