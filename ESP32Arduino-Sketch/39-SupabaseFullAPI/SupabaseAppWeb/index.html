@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ESP32 Supabase</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+    <script>
+      const SUPABASE_URL = "https://mgqasbkqqquvixgxsfgo.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ncWFzYmtxcXF1dml4Z3hzZmdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjM5NTA0NjUsImV4cCI6MTk3OTUyNjQ2NX0.IOpbZhjdAJzMzpuhbT-lbkYmlprOHEbQMNenJHxwElk";
+
+      const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    </script>
+
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+      integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr"
+      crossorigin="anonymous"
+    />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+  </head>
+
+  <body>
+    <!--Barra Título-->
+    <div class="topnav">
+      <h1>Lecturas del sensor DHT11 <i class="fas fa-clipboard-list"></i></h1>
+    </div>
+    <!--LECTURAS DEL SENSOR-->
+    <div id="holder"></div>
+    <div>
+      <div class="cards">
+        <!--TEMPERATURA-->
+        <div class="card">
+          <p>
+            <i class="fas fa-thermometer-half" style="color: #00add6"></i>
+            TEMPERATURA
+          </p>
+          <p>
+            <span class="reading"><span id="temp"></span> &deg;C</span>
+          </p>
+        </div>
+        <!--HUMEDAD-->
+        <div class="card">
+          <p><i class="fas fa-tint" style="color: #00add6"></i> HUMEDAD</p>
+          <p>
+            <span class="reading"><span id="hum"></span> &percnt;</span>
+          </p>
+        </div>
+        <!--BOTON ON-->
+        <div class="card">
+          <p>
+            <i class="fas fa-lightbulb" style="color: #00add6"></i> ENCENDER LED
+          </p>
+          <button class="button" onclick="onOff()">On/Off</button>
+        </div>
+        <!--POTENCIÓMETRO-->
+        <div class="card">
+          <p>
+            <i class="fas fa-lightbulb" style="color: #00add6"></i> ENCENDER LED
+          </p>
+          <input
+          oninput="pwm()"
+          type="range"
+          min="0"
+          max="255"
+          class="slider"
+          id="potenciometro"
+        />
+        <p>Valor: <span id="valor"></span></p>
+        </div>
+      </div>
+    </div>
+    <script>
+      let estado = true;
+
+      var pot = document.getElementById("potenciometro");
+      var output = document.getElementById("valor");
+
+      pot.oninput = async function () { 
+        output.innerHTML = this.value
+        try {
+          const { data, error } = await _supabase
+          .from("LED")
+          .update({ potenciometro: this.value })
+          .eq('id', 1);
+          console.log("El campo es: " + this.value);
+        } catch (err) {
+          console.error("Error al recibir los datos de la db", err);
+        }
+      }
+
+      async function onOff() {  
+        estado = !estado;
+        try {
+          const { data, error } = await _supabase
+          .from("LED")
+          .update({ encendido: estado })
+          .eq('id', 1);
+            console.log("El estado es: " + estado);
+        } catch (err) {
+          console.error("Error al recibir los datos de la db", err);
+        }
+      }
+
+      async function datosSensores() {
+        try {
+          const { data, error } = await _supabase.from("DHT").select();
+          let temperatura = "";
+          let humedad = "";
+          data.forEach(function (item) {
+            temperatura = item.temperatura;
+            humedad = item.humedad;
+            console.log(data);
+          });
+          document.getElementById("temp").innerHTML = temperatura.toFixed(2);
+          document.getElementById("hum").innerHTML = humedad;
+        } catch (err) {
+          console.error("Error al recibir los datos de la db", err);
+        }
+      }
+
+      async function subscribeSensor() {
+        const mySubscription = _supabase
+          .from("DHT")
+          .on("*", (payload) => {
+            console.log("¡Recibiendo cambios!", payload);
+          })
+          .subscribe();
+        datosSensores();
+      }
+      subscribeSensor();
+      slider.oninput = function () {
+        output.innerHTML = this.value;
+      }
+    </script>
+  </body>
+</html>
