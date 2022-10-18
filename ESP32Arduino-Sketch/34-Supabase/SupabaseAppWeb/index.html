@@ -77,7 +77,7 @@
 
     async function subscribeSensor() {
         const mySubscription = _supabase
-          .from('ESP32')
+          .channel('*')
           .on('*', (payload) => {
             obtenerProductos();
             console.log('¡Recibiendo cambios!', payload)
