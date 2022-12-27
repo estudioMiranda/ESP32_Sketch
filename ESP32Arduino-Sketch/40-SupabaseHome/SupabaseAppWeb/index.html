@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domótica con ESP32</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+    <script>
+      const SUPABASE_URL = "https://vommeepgegbaadwlmcns.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvbW1lZXBnZWdiYWFkd2xtY25zIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTc1NTU0NDUsImV4cCI6MTk3MzEzMTQ0NX0.COSffX_5xvZOJrqt7ddbwGV32KggfYK-TeZRTUyeC_c";
+
+      const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    </script>
+
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+      integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr"
+      crossorigin="anonymous"
+    />
+    <link rel="icon" type="image/ico" href="https://github.com/arduinoes/imagenes/blob/main/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+  </head>
+
+  <body>
+    <!--Barra Título-->
+    <div class="topnav">
+      <h1>Domótica <i class="fas fa-clipboard-list"></i></h1>
+    </div>
+    <!--LECTURAS DEL SENSOR-->
+    <div id="holder"></div>
+    <div>
+      <div class="cards">
+        <!--TEMPERATURA-->
+        <div class="card">
+          <p>
+            <i class="fas fa-thermometer-half" style="color: #00add6"></i>
+            TEMPERATURA
+          </p>
+          <p>
+            <span class="reading"><span id="temp"></span> &deg;C</span>
+          </p>
+        </div>
+        <!--HUMEDAD-->
+        <div class="card">
+          <p><i class="fas fa-tint" style="color: #00add6"></i> HUMEDAD</p>
+          <p>
+            <span class="reading"><span id="hum"></span> &percnt;</span>
+          </p>
+        </div>
+       <!--BOTON ON-->
+       <div class="card">
+        <p>
+          <i class="fas fa-lightbulb" style="color: #00add6"></i> Luz 1
+        </p>
+        <button id="luz1" onclick="onOff( 'luz1', luz1)"></button>
+      </div>
+
+      <div class="card">
+        <p>
+          <i class="fas fa-lightbulb" style="color: #00add6"></i> Luz 2
+        </p>
+        <button id="luz2" onclick="onOff( 'luz2', luz2)"></button>
+      </div>
+
+      <div class="card">
+        <p>
+          <i class="fas fa-lightbulb" style="color: #00add6"></i> Luz 3
+        </p>
+        <button id="luz3" onclick="onOff( 'luz3', luz3)"></button>
+      </div>
+
+      </div>
+    </div>
+    <script>
+
+      let luz1 = "";
+      let luz2 = "";
+      let luz3 = "";
+      let temp = '';
+      let hum = '';
+
+      let datos = [''];
+    // Cambiamos el estado de las luces
+    async function onOff(luz, estado) {  
+        try {
+          const { data, error } = await _supabase
+          .from('esp32')
+          .upsert({ id: 1, [luz]: !estado })
+          .select()
+          datosLuces();
+        } catch (error) {
+          console.error("Error al recibir los datos de la db", error);
+        } finally{
+          datosLuces();
+        }
+      }
+      // Obtenemos el estado de todas las luces
+      async function datosLuces() {
+        try {
+          const { data, error } = await _supabase
+          .from("esp32")
+          .select('*');
+          data.forEach(function (item) {
+            luz1 = item.luz1;
+            luz2 = item.luz2;
+            luz3 = item.luz3;
+            temp = item.temperatura;
+            hum = item.humedad;
+           });
+       
+          document.getElementById('luz1').innerHTML = luz1;
+          document.getElementById('luz2').innerHTML = luz2;
+          document.getElementById('luz3').innerHTML = luz3;
+          document.getElementById("temp").innerHTML = temp.toFixed(2);
+          document.getElementById("hum").innerHTML = hum;
+        } catch (err) {
+          console.error("Error al recibir los datos de la db", err);
+        }
+      }
+
+      async function subscribeSensor() {
+        const mySubscription = _supabase
+        .channel('*')
+        .on('postgres_changes', { event: '*', schema: '*', from: 'esp32' }, payload => {
+          console.log('¡Cambios recibidos!', payload)
+        datosLuces();
+        })
+        .subscribe();
+    
+      }
+      subscribeSensor();
+      datosLuces();
+    </script>
+  </body>
+</html>
